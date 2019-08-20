@@ -1,7 +1,7 @@
 server {
     listen       80;
     listen       [::]:80;
-    server_name  {$server_name}{if $redirect_nonwww} {$domain}{/if}{if $server_alias} {$server_alias}{/if};
+    server_name  {$server_name}{if $redirect_www} www.{$domain}{/if}{if $server_alias} {$server_alias}{/if};
 
     location / {
         rewrite ^/(.*)$ {$redirect_url}/$1 redirect;
@@ -11,7 +11,7 @@ server {
 server {
     listen       443 ssl http2;
     listen       [::]:443 ssl http2;
-    server_name  {$server_name}{if $redirect_nonwww} {$domain}{/if}{if $server_alias} {$server_alias}{/if};
+    server_name  {$server_name}{if $redirect_www} www.{$domain}{/if}{if $server_alias} {$server_alias}{/if};
 
     location / {
         rewrite ^/(.*)$ {$redirect_url}/$1 redirect;

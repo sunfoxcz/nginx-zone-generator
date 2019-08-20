@@ -66,7 +66,7 @@ foreach ($zones as $zone) {
             'server_alias' => str_replace(',', ' ', $zone->server_alias),
             'domain' => $domain,
             'redirect_url' => Strings::trim($zone->redirect_url, '/'),
-            'redirect_nonwww' => $zone->redirect_nonwww,
+            'redirect_www' => $zone->redirect_www,
             'ssl_enabled' => $zone->ssl_enabled,
             'ssl_sst_header' => $zone->ssl_sst_header,
             'ssl_acme' => $zone->ssl_acme,
@@ -90,7 +90,7 @@ foreach ($zones as $zone) {
         'ssl_dir' => $sslDir,
         'cert_generated' => is_link("/etc/letsencrypt/live/{$sslDir}/fullchain.pem"),
         'redirect_http' => $zone->redirect_http,
-        'redirect_nonwww' => $zone->redirect_nonwww,
+        'redirect_www' => $zone->redirect_www,
         'additional_config' => $zone->additional_config,
     ]);
     file_put_contents("{$parameters['zoneDir']}/$fileName", $zone);
