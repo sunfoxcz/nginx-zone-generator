@@ -1,27 +1,28 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
 
-// -----------------------------------------------------------------------------
-
-require __DIR__ . '/vendor/autoload.php';
+namespace Sunfox\NginxZoneGenerator;
 
 use Nette\Utils\Strings;
 
 // -----------------------------------------------------------------------------
 
-$configurator = new Nette\Configurator;
-$configurator->setDebugMode(TRUE);
-$configurator->setTempDirectory(__DIR__ . '/temp');
-$configurator->addConfig(__DIR__ . '/config.neon');
-$container = $configurator->createContainer();
+require __DIR__ . '/../vendor/autoload.php';
 
 // -----------------------------------------------------------------------------
 
-$latte = new Latte\Engine;
-$latte->setTempDirectory(__DIR__ . '/temp');
+$container = Bootstrap::boot()->createContainer();
 
-// -----------------------------------------------------------------------------
-
+/** @var \Nette\Database\Context $db */
 $db = $container->getService('database.default.context');
+
+/** @var \Latte\Engine $latte */
+$latte = $container->getByType(\Latte\Engine::class);
+
+$parameters = $container->getParameters();
+
+// -----------------------------------------------------------------------------
+
 $zones = $db->table('nginx_zone');
 
 foreach ($zones as $zone) {
@@ -55,11 +56,11 @@ foreach ($zones as $zone) {
             exit(1);
         }
         */
-        echo "Certificate is missing, run 'sudo certbot --nginx --quiet certonly -d " . implode(',', $sslDomains) . "' and run this script again";
+        echo "Certificate is missing, run 'sudo certbot --nginx --quiet certonly -d " . implode(',', $sslDomains) . "' and run this script again\n";
     }
 
     if ($zone->redirect_url) {
-        $zone = $latte->renderToString(__DIR__ . '/templates/redirect.latte', [
+        $zone = $latte->renderToString(__DIR__ . '/../templates/redirect.latte', [
             'server_name' => $zone->server_name,
             'server_alias' => str_replace(',', ' ', $zone->server_alias),
             'domain' => $domain,
@@ -70,11 +71,11 @@ foreach ($zones as $zone) {
             'ssl_acme' => $zone->ssl_acme,
             'cert_generated' => is_link("/etc/letsencrypt/live/{$zone->server_name}/fullchain.pem"),
         ]);
-        file_put_contents("/etc/nginx/sites.d/$fileName", $zone);
+        file_put_contents("{$parameters['zoneDir']}/$fileName", $zone);
         continue;
     }
 
-    $zone = $latte->renderToString(__DIR__ . '/templates/zone.latte', [
+    $zone = $latte->renderToString(__DIR__ . '/../templates/zone.latte', [
         'server_name' => $zone->server_name,
         'server_alias' => str_replace(',', ' ', $zone->server_alias),
         'domain' => $domain,
@@ -90,7 +91,7 @@ foreach ($zones as $zone) {
         'redirect_nonwww' => $zone->redirect_nonwww,
         'additional_config' => $zone->additional_config,
     ]);
-    file_put_contents("/etc/nginx/sites.d/$fileName", $zone);
+    file_put_contents("{$parameters['zoneDir']}/$fileName", $zone);
 }
 
 $output = [];

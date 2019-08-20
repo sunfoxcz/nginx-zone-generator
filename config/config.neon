@@ -1,0 +1,9 @@
+services:
+    latte:
+        class: Latte\Engine
+        setup:
+            - setStrictTypes(true)
+            - setTempDirectory(%tempDir%)
+
+parameters:
+    zoneDir: /etc/nginx/sites.d
