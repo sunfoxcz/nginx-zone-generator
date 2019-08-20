@@ -1,0 +1,22 @@
+{
+    "name": "sunfoxcz/nginx-zone-generator",
+    "description": "Generates Nginx webserver zones from MySQL database",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomas Jacik",
+            "email": "tomas.jacik@sunfox.cz"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "nette/bootstrap": "^2.4",
+        "nette/database": "^2.4",
+        "nette/utils": "^2.4",
+        "latte/latte": "^2.4"
+    },
+    "require-dev": {
+        "tracy/tracy": "^2.4"
+    }
+}

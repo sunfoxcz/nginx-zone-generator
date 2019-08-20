@@ -1,0 +1,35 @@
+server {
+    listen       80;
+    listen       [::]:80;
+    server_name  {$server_name}{if $redirect_nonwww} {$domain}{/if}{if $server_alias} {$server_alias}{/if};
+
+    location / {
+        rewrite ^/(.*)$ {$redirect_url}/$1 redirect;
+    }
+}
+{if $ssl_enabled}
+server {
+    listen       443 ssl http2;
+    listen       [::]:443 ssl http2;
+    server_name  {$server_name}{if $redirect_nonwww} {$domain}{/if}{if $server_alias} {$server_alias}{/if};
+
+    location / {
+        rewrite ^/(.*)$ {$redirect_url}/$1 redirect;
+    }
+    {if $ssl_acme && $cert_generated}
+
+    ssl_certificate          /etc/letsencrypt/live/{$server_name}/fullchain.pem;
+    ssl_certificate_key      /etc/letsencrypt/live/{$server_name}/privkey.pem;
+    ssl_trusted_certificate  /etc/letsencrypt/live/{$server_name}/chain.pem;
+    {else}
+
+    ssl_certificate          /etc/nginx/ssl/footshop.cz.chained.crt;
+    ssl_certificate_key      /etc/nginx/ssl/footshop.cz.key;
+    ssl_trusted_certificate  /etc/nginx/ssl/alpiro.intermediate.crt;
+    {/if}
+    {if $ssl_sst_header}
+
+    add_header Strict-Transport-Security 'max-age=31536000' always;
+    {/if}
+}
+{/if}

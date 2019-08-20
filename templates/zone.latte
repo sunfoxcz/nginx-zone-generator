@@ -1,0 +1,92 @@
+{if $ssl_enabled && $redirect_http}
+server {
+    listen       80;
+    listen       [::]:80;
+    server_name  {$server_name}{if $redirect_nonwww} {$domain}{/if}{if $server_alias} {$server_alias}{/if};
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+{/if}
+{if $redirect_nonwww}
+server {
+    {if $ssl_enabled}
+    listen       443 ssl http2;
+    listen       [::]:443 ssl http2;
+    {else}
+    listen       80;
+    listen       [::]:80;
+    {/if}
+    server_name  {$domain};
+
+    location / {
+        return 301 {$ssl_enabled ? 'https' : 'http'}://{$server_name}$request_uri;
+    }
+    {if $ssl_enabled}
+
+    {if $ssl_acme && $cert_generated}
+    ssl_certificate          /etc/letsencrypt/live/{$server_name}/fullchain.pem;
+    ssl_certificate_key      /etc/letsencrypt/live/{$server_name}/privkey.pem;
+    ssl_trusted_certificate  /etc/letsencrypt/live/{$server_name}/chain.pem;
+    {else}
+    ssl_certificate          /etc/nginx/ssl/footshop.cz.chained.crt;
+    ssl_certificate_key      /etc/nginx/ssl/footshop.cz.key;
+    ssl_trusted_certificate  /etc/nginx/ssl/alpiro.intermediate.crt;
+    {/if}
+    {if $ssl_sst_header}
+
+    add_header Strict-Transport-Security 'max-age=31536000' always;
+    {/if}
+    {/if}
+}
+
+{/if}
+server {
+    {if $ssl_enabled}
+    listen       443 ssl http2;
+    listen       [::]:443 ssl http2;
+    {else}
+    listen       80;
+    listen       [::]:80;
+    {/if}
+    server_name  {$server_name}{if $server_alias} {$server_alias}{/if};
+    {if $document_root}
+    root         {$document_root};
+    index        index.html{if $php_enabled} index.php{/if};
+    {/if}
+
+    access_log   /var/log/nginx/{$domain}{if $subdomain && $subdomain !== 'www'}.{$subdomain}{/if}.access.log;
+    error_log    /var/log/nginx/{$domain}{if $subdomain && $subdomain !== 'www'}.{$subdomain}{/if}.error.log;
+
+    include snippets/secure_files;
+    {if $additional_config}
+
+{block |indent:1:'    '}{$additional_config|trim|noescape}{/block}
+    {/if}
+    {if $php_enabled}
+
+    location ~ \.php$ {
+        include       fastcgi_params;
+        include       fastcgi_limits;
+        fastcgi_pass  127.0.0.1:{$php_port};
+    }
+    {/if}
+    {if $ssl_enabled}
+
+    {if $ssl_acme && $cert_generated}
+    ssl_certificate          /etc/letsencrypt/live/{$server_name}/fullchain.pem;
+    ssl_certificate_key      /etc/letsencrypt/live/{$server_name}/privkey.pem;
+    ssl_trusted_certificate  /etc/letsencrypt/live/{$server_name}/chain.pem;
+    {else}
+    ssl_certificate          /etc/nginx/ssl/footshop.cz.chained.crt;
+    ssl_certificate_key      /etc/nginx/ssl/footshop.cz.key;
+    ssl_trusted_certificate  /etc/nginx/ssl/alpiro.intermediate.crt;
+    {/if}
+    {if $ssl_sst_header}
+
+    add_header Strict-Transport-Security 'max-age=31536000' always;
+    {/if}
+    {/if}
+}
