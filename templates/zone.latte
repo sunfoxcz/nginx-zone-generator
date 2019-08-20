@@ -54,7 +54,7 @@ server {
     server_name  {$server_name}{if $server_alias} {$server_alias}{/if};
     {if $document_root}
     root         {$document_root};
-    index        index.html{if $php_enabled} index.php{/if};
+    index        index.html{if $php_upstream} index.php{/if};
     {/if}
 
     access_log   /var/log/nginx/{$domain}{if $subdomain && $subdomain !== 'www'}.{$subdomain}{/if}.access.log;
@@ -65,12 +65,12 @@ server {
 
 {block |indent:1:'    '}{$additional_config|trim|noescape}{/block}
     {/if}
-    {if $php_enabled}
+    {if $php_upstream}
 
     location ~ \.php$ {
         include       fastcgi_params;
         include       fastcgi_limits;
-        fastcgi_pass  127.0.0.1:{$php_port};
+        fastcgi_pass  {$php_upstream};
     }
     {/if}
     {if $ssl_enabled}

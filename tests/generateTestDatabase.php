@@ -23,8 +23,7 @@ $db->query("
       `server_name` varchar(100) NOT NULL UNIQUE,
       `server_alias` text DEFAULT '',
       `document_root` varchar(255) DEFAULT NULL,
-      `php_enabled` tinyint(1) NOT NULL DEFAULT '1',
-      `php_port` int(11) DEFAULT NULL,
+      `php_upstream` varchar(32) DEFAULT NULL,
       `ssl_enabled` tinyint(1) NOT NULL DEFAULT '1',
       `ssl_sst_header` tinyint(1) NOT NULL DEFAULT '1',
       `ssl_acme` tinyint(1) NOT NULL DEFAULT '1',
@@ -37,5 +36,5 @@ $db->query("
 
 // -----------------------------------------------------------------------------
 
-$db->query("INSERT INTO `nginx_zone` (`server_name`, `document_root`, `php_port`) VALUES ('server1.test', '/srv/server1.test', 9000)");
-$db->query("INSERT INTO `nginx_zone` (`server_name`, `document_root`, `php_port`) VALUES ('server2.test', '/srv/server2.test', 9000)");
+$db->query("INSERT INTO `nginx_zone` (`server_name`, `document_root`, `php_upstream`) VALUES ('server1.test', '/srv/server1.test', 'php56')");
+$db->query("INSERT INTO `nginx_zone` (`server_name`, `document_root`, `php_upstream`) VALUES ('server2.test', '/srv/server2.test', 'php72')");
