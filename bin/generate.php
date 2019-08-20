@@ -30,10 +30,11 @@ foreach ($zones as $zone) {
     $domain = $names['domain'];
     $subdomain = $names['subdomain'];
     $fileName = $domain . ($subdomain && $subdomain !== 'www' ? '.' . $subdomain : '');
+    $sslDir = $zone->ssl_dir ?: $zone->server_name;
 
     echo "Generating zone \033[32m{$zone->server_name}\033[0m\n";
 
-    if ($zone->ssl_enabled && $zone->ssl_acme && !is_link("/etc/letsencrypt/live/{$zone->server_name}/fullchain.pem")) {
+    if ($zone->ssl_enabled && $zone->ssl_acme && !is_link("/etc/letsencrypt/live/{$sslDir}/fullchain.pem")) {
         $sslDomains = [$zone->server_name];
         if ($subdomain === 'www') {
             $sslDomains[] = $domain;
@@ -69,7 +70,8 @@ foreach ($zones as $zone) {
             'ssl_enabled' => $zone->ssl_enabled,
             'ssl_sst_header' => $zone->ssl_sst_header,
             'ssl_acme' => $zone->ssl_acme,
-            'cert_generated' => is_link("/etc/letsencrypt/live/{$zone->server_name}/fullchain.pem"),
+            'ssl_dir' => $sslDir,
+            'cert_generated' => is_link("/etc/letsencrypt/live/{$sslDir}/fullchain.pem"),
         ]);
         file_put_contents("{$parameters['zoneDir']}/$fileName", $zone);
         continue;
@@ -85,7 +87,8 @@ foreach ($zones as $zone) {
         'ssl_enabled' => $zone->ssl_enabled,
         'ssl_sst_header' => $zone->ssl_sst_header,
         'ssl_acme' => $zone->ssl_acme,
-        'cert_generated' => is_link("/etc/letsencrypt/live/{$zone->server_name}/fullchain.pem"),
+        'ssl_dir' => $sslDir,
+        'cert_generated' => is_link("/etc/letsencrypt/live/{$sslDir}/fullchain.pem"),
         'redirect_http' => $zone->redirect_http,
         'redirect_nonwww' => $zone->redirect_nonwww,
         'additional_config' => $zone->additional_config,

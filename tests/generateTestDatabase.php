@@ -27,10 +27,11 @@ $db->query("
       `ssl_enabled` tinyint(1) NOT NULL DEFAULT '1',
       `ssl_sst_header` tinyint(1) NOT NULL DEFAULT '1',
       `ssl_acme` tinyint(1) NOT NULL DEFAULT '1',
+      `ssl_dir` varchar(100) DEFAULT NULL,
       `redirect_http` tinyint(1) NOT NULL DEFAULT '1',
       `redirect_nonwww` tinyint(1) NOT NULL DEFAULT '0',
       `redirect_url` varchar(255) DEFAULT NULL,
-      `additional_config` text
+      `additional_config` text DEFAULT ''
     );
 ");
 

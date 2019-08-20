@@ -18,9 +18,9 @@ server {
     }
     {if $ssl_acme && $cert_generated}
 
-    ssl_certificate          /etc/letsencrypt/live/{$server_name}/fullchain.pem;
-    ssl_certificate_key      /etc/letsencrypt/live/{$server_name}/privkey.pem;
-    ssl_trusted_certificate  /etc/letsencrypt/live/{$server_name}/chain.pem;
+    ssl_certificate          /etc/letsencrypt/live/{$ssl_dir}/fullchain.pem;
+    ssl_certificate_key      /etc/letsencrypt/live/{$ssl_dir}/privkey.pem;
+    ssl_trusted_certificate  /etc/letsencrypt/live/{$ssl_dir}/chain.pem;
     {else}
 
     ssl_certificate          /etc/nginx/ssl/footshop.cz.chained.crt;
