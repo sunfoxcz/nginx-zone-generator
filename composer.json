@@ -1,6 +1,6 @@
 {
     "name": "sunfoxcz/nginx-zone-generator",
-    "description": "Generates Nginx webserver zones from MySQL database",
+    "description": "Generates Nginx webserver zones from database",
     "type": "project",
     "license": "MIT",
     "authors": [

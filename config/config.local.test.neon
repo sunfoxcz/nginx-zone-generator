@@ -1,0 +1,5 @@
+database:
+    dsn: 'sqlite:%appDir%/../temp/zones.sqlite'
+
+parameters:
+    zoneDir: %tempDir%/zones
